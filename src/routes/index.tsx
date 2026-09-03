@@ -157,7 +157,7 @@ function Index() {
   const fieldClass =
     "rounded-xl bg-card/70 px-3 py-2.5 text-sm ring-1 ring-card/70 backdrop-blur-xl outline-none focus:ring-2 focus:ring-brand/50";
 
-  const breedBg = BREED_IMAGES[breed] ?? BREED_IMAGES[BREEDS[0]];
+  
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden text-ink selection:bg-brand/20">
