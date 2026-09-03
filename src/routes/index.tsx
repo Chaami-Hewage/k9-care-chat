@@ -66,74 +66,6 @@ const SYMPTOMS = [
   { emoji: "🦴", label: "Limping" },
 ];
 
-const BREED_CARDS = [
-  {
-    img: hound,
-    name: "Srilankan Hound",
-    note: "Athletic, loyal, short coat",
-    alt: "A Sri Lankan Hound being hugged cheek to cheek by its owner",
-  },
-  {
-    img: golden,
-    name: "Golden Retriever",
-    note: "Gentle, playful, water-loving",
-    alt: "A Golden Retriever hugging a smiling man in golden evening light",
-  },
-  {
-    img: collie,
-    name: "Border Collie",
-    note: "Brilliant, energetic, keen",
-    alt: "A child hugging a Border Collie in a sunny grass field",
-  },
-  {
-    img: pug,
-    name: "Pug",
-    note: "Charming, mischievous, loving",
-    alt: "A cute Pug being hugged by a smiling person in warm golden light",
-  },
-  {
-    img: gsd,
-    name: "German Shepherd",
-    note: "Loyal, confident, courageous",
-    alt: "A German Shepherd being hugged by its owner in a sunny park",
-  },
-  {
-    img: rottweiler,
-    name: "Rottweiler",
-    note: "Strong, devoted, steady",
-    alt: "A Rottweiler being hugged by its loving owner in warm afternoon light",
-  },
-  {
-    img: beagle,
-    name: "Beagle",
-    note: "Curious, merry, friendly",
-    alt: "A Beagle being hugged by a child in a sunny garden",
-  },
-  {
-    img: cocker,
-    name: "Cocker Spaniel",
-    note: "Gentle, smart, happy",
-    alt: "A Cocker Spaniel being hugged by its owner in warm light",
-  },
-  {
-    img: dachshund,
-    name: "Dachshund",
-    note: "Playful, stubborn, clever",
-    alt: "A Dachshund being cuddled and hugged by its owner at home",
-  },
-  {
-    img: husky,
-    name: "Husky",
-    note: "Energetic, outgoing, striking",
-    alt: "A blue-eyed Siberian Husky being hugged by its owner in the snow",
-  },
-  {
-    img: shihTzu,
-    name: "Shih Tzu",
-    note: "Affectionate, outgoing, playful",
-    alt: "A fluffy Shih Tzu being hugged by its owner in a cozy home",
-  },
-];
 
 const BREED_IMAGES: Record<string, { img: string; alt: string }> = {
   "Srilankan Hound": {
@@ -432,27 +364,6 @@ function Index() {
               </div>
             </div>
 
-            <div className="rounded-3xl bg-card/40 p-5 shadow-xl shadow-brand/10 ring-1 ring-card/60 backdrop-blur-2xl">
-              <h2 className="font-display text-lg font-semibold">Meet our breeds</h2>
-              <div className="mt-4 flex flex-col gap-3">
-                {BREED_CARDS.map((b) => (
-                  <div key={b.name} className="flex items-center gap-3">
-                    <img
-                      src={b.img}
-                      alt={b.alt}
-                      loading="lazy"
-                      width={512}
-                      height={512}
-                      className="size-14 shrink-0 rounded-2xl object-cover ring-1 ring-card/70"
-                    />
-                    <div>
-                      <p className="text-sm font-semibold">{b.name}</p>
-                      <p className="text-xs text-ink/50">{b.note}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </aside>
         </div>
       </div>
