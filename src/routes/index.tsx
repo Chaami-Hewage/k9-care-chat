@@ -432,27 +432,6 @@ function Index() {
               </div>
             </div>
 
-            <div className="rounded-3xl bg-card/40 p-5 shadow-xl shadow-brand/10 ring-1 ring-card/60 backdrop-blur-2xl">
-              <h2 className="font-display text-lg font-semibold">Meet our breeds</h2>
-              <div className="mt-4 flex flex-col gap-3">
-                {BREED_CARDS.map((b) => (
-                  <div key={b.name} className="flex items-center gap-3">
-                    <img
-                      src={b.img}
-                      alt={b.alt}
-                      loading="lazy"
-                      width={512}
-                      height={512}
-                      className="size-14 shrink-0 rounded-2xl object-cover ring-1 ring-card/70"
-                    />
-                    <div>
-                      <p className="text-sm font-semibold">{b.name}</p>
-                      <p className="text-xs text-ink/50">{b.note}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </aside>
         </div>
       </div>
