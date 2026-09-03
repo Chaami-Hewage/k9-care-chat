@@ -71,6 +71,34 @@ const BREED_CARDS = [
   },
 ];
 
+const BREED_IMAGES: Record<string, { img: string; alt: string }> = {
+  "Srilankan Hound": {
+    img: hound,
+    alt: "A Sri Lankan Hound being hugged cheek to cheek by its owner",
+  },
+  "Malay Pointer": {
+    img: pointer,
+    alt: "A Malay Pointer hugged by its smiling owner in a sunny garden",
+  },
+  "Indie Native Dog": {
+    img: indie,
+    alt: "A child hugging a tan Sri Lankan indie native dog at golden hour",
+  },
+  "Golden Retriever": {
+    img: golden,
+    alt: "A Golden Retriever hugging a smiling man in golden evening light",
+  },
+  "Labrador Retriever": {
+    img: labrador,
+    alt: "A yellow Labrador Retriever being kissed and hugged by its owner",
+  },
+  "Border Collie": {
+    img: collie,
+    alt: "A child hugging a Border Collie in a sunny grass field",
+  },
+};
+
+
 function Index() {
   const [breed, setBreed] = useState(BREEDS[0]);
   const [age, setAge] = useState("3");
