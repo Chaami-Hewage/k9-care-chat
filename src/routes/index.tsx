@@ -157,12 +157,30 @@ function Index() {
   const fieldClass =
     "rounded-xl bg-card/70 px-3 py-2.5 text-sm ring-1 ring-card/70 backdrop-blur-xl outline-none focus:ring-2 focus:ring-brand/50";
 
+  const breedBg = BREED_IMAGES[breed] ?? BREED_IMAGES[BREEDS[0]];
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden text-ink selection:bg-brand/20">
-      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-mist via-secondary to-accent/15" />
-      <div className="pointer-events-none absolute -top-24 -left-20 size-[460px] rounded-full bg-brand/25 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 -right-16 size-[420px] rounded-full bg-accent/20 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 left-1/3 size-[380px] rounded-full bg-teal/25 blur-3xl" />
+      <div className="pointer-events-none fixed inset-0">
+        {Object.entries(BREED_IMAGES).map(([name, b]) => (
+          <img
+            key={name}
+            src={b.img}
+            alt={name === breed ? b.alt : ""}
+            aria-hidden={name === breed ? undefined : true}
+            width={1024}
+            height={640}
+            className={`absolute inset-0 size-full object-cover transition-opacity duration-700 ease-out ${
+              name === breed ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-card/55 backdrop-blur-[2px]" />
+      </div>
+      <div className="pointer-events-none absolute -top-24 -left-20 size-[460px] rounded-full bg-brand/15 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 -right-16 size-[420px] rounded-full bg-accent/15 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-1/3 size-[380px] rounded-full bg-teal/15 blur-3xl" />
+
 
       <div className="relative mx-auto max-w-6xl px-5 py-8 lg:px-8">
         <header className="flex items-center justify-between">
