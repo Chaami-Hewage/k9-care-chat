@@ -6,6 +6,9 @@ import remarkGfm from "remark-gfm";
 import hound from "@/assets/dog-sri-lankan-hound.jpg";
 import golden from "@/assets/dog-golden-retriever.jpg";
 import collie from "@/assets/dog-border-collie.jpg";
+import pointer from "@/assets/dog-malay-pointer.jpg";
+import indie from "@/assets/dog-indie.jpg";
+import labrador from "@/assets/dog-labrador.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
