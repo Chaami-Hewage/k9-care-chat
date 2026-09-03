@@ -85,6 +85,54 @@ const BREED_CARDS = [
     note: "Brilliant, energetic, keen",
     alt: "A child hugging a Border Collie in a sunny grass field",
   },
+  {
+    img: pug,
+    name: "Pug",
+    note: "Charming, mischievous, loving",
+    alt: "A cute Pug being hugged by a smiling person in warm golden light",
+  },
+  {
+    img: gsd,
+    name: "German Shepherd",
+    note: "Loyal, confident, courageous",
+    alt: "A German Shepherd being hugged by its owner in a sunny park",
+  },
+  {
+    img: rottweiler,
+    name: "Rottweiler",
+    note: "Strong, devoted, steady",
+    alt: "A Rottweiler being hugged by its loving owner in warm afternoon light",
+  },
+  {
+    img: beagle,
+    name: "Beagle",
+    note: "Curious, merry, friendly",
+    alt: "A Beagle being hugged by a child in a sunny garden",
+  },
+  {
+    img: cocker,
+    name: "Cocker Spaniel",
+    note: "Gentle, smart, happy",
+    alt: "A Cocker Spaniel being hugged by its owner in warm light",
+  },
+  {
+    img: dachshund,
+    name: "Dachshund",
+    note: "Playful, stubborn, clever",
+    alt: "A Dachshund being cuddled and hugged by its owner at home",
+  },
+  {
+    img: husky,
+    name: "Husky",
+    note: "Energetic, outgoing, striking",
+    alt: "A blue-eyed Siberian Husky being hugged by its owner in the snow",
+  },
+  {
+    img: shihTzu,
+    name: "Shih Tzu",
+    note: "Affectionate, outgoing, playful",
+    alt: "A fluffy Shih Tzu being hugged by its owner in a cozy home",
+  },
 ];
 
 const BREED_IMAGES: Record<string, { img: string; alt: string }> = {
