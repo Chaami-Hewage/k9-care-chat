@@ -6,6 +6,9 @@ import remarkGfm from "remark-gfm";
 import hound from "@/assets/dog-sri-lankan-hound.jpg";
 import golden from "@/assets/dog-golden-retriever.jpg";
 import collie from "@/assets/dog-border-collie.jpg";
+import pointer from "@/assets/dog-malay-pointer.jpg";
+import indie from "@/assets/dog-indie.jpg";
+import labrador from "@/assets/dog-labrador.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -68,6 +71,34 @@ const BREED_CARDS = [
   },
 ];
 
+const BREED_IMAGES: Record<string, { img: string; alt: string }> = {
+  "Srilankan Hound": {
+    img: hound,
+    alt: "A Sri Lankan Hound being hugged cheek to cheek by its owner",
+  },
+  "Malay Pointer": {
+    img: pointer,
+    alt: "A Malay Pointer hugged by its smiling owner in a sunny garden",
+  },
+  "Indie Native Dog": {
+    img: indie,
+    alt: "A child hugging a tan Sri Lankan indie native dog at golden hour",
+  },
+  "Golden Retriever": {
+    img: golden,
+    alt: "A Golden Retriever hugging a smiling man in golden evening light",
+  },
+  "Labrador Retriever": {
+    img: labrador,
+    alt: "A yellow Labrador Retriever being kissed and hugged by its owner",
+  },
+  "Border Collie": {
+    img: collie,
+    alt: "A child hugging a Border Collie in a sunny grass field",
+  },
+};
+
+
 function Index() {
   const [breed, setBreed] = useState(BREEDS[0]);
   const [age, setAge] = useState("3");
@@ -126,12 +157,30 @@ function Index() {
   const fieldClass =
     "rounded-xl bg-card/70 px-3 py-2.5 text-sm ring-1 ring-card/70 backdrop-blur-xl outline-none focus:ring-2 focus:ring-brand/50";
 
+  
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden text-ink selection:bg-brand/20">
-      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-mist via-secondary to-accent/15" />
-      <div className="pointer-events-none absolute -top-24 -left-20 size-[460px] rounded-full bg-brand/25 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 -right-16 size-[420px] rounded-full bg-accent/20 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 left-1/3 size-[380px] rounded-full bg-teal/25 blur-3xl" />
+      <div className="pointer-events-none fixed inset-0">
+        {Object.entries(BREED_IMAGES).map(([name, b]) => (
+          <img
+            key={name}
+            src={b.img}
+            alt={name === breed ? b.alt : ""}
+            aria-hidden={name === breed ? undefined : true}
+            width={1024}
+            height={640}
+            className={`absolute inset-0 size-full object-cover transition-opacity duration-700 ease-out ${
+              name === breed ? "opacity-100" : "opacity-0"
+            }`}
+          />
+        ))}
+        <div className="absolute inset-0 bg-card/55 backdrop-blur-[2px]" />
+      </div>
+      <div className="pointer-events-none absolute -top-24 -left-20 size-[460px] rounded-full bg-brand/15 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 -right-16 size-[420px] rounded-full bg-accent/15 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-1/3 size-[380px] rounded-full bg-teal/15 blur-3xl" />
+
 
       <div className="relative mx-auto max-w-6xl px-5 py-8 lg:px-8">
         <header className="flex items-center justify-between">
