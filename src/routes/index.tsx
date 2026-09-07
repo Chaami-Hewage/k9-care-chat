@@ -156,10 +156,11 @@ function Index() {
     setMessages((m) => [...m, { role: "user", content: message }]);
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/ask-vet", {
+      const endpoint = import.meta.env.VITE_API_URL || "http://localhost:8000/api/ask-vet";
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, breed }),
+        body: JSON.stringify({ message, breed, age, weight }),
       });
       if (!res.ok) throw new Error(`Request failed (${res.status})`);
       const data = await res.json();
