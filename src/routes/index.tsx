@@ -1,8 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import mascotAsset from "@/assets/know-your-dog-mascot.png.asset.json";
 import hound from "@/assets/dog-sri-lankan-hound.jpg";
 import golden from "@/assets/dog-golden-retriever.jpg";
 import collie from "@/assets/dog-border-collie.jpg";
@@ -126,6 +134,67 @@ const BREED_IMAGES: Record<string, { img: string; alt: string }> = {
   },
 };
 
+function FloatingMascot() {
+  const prefersReducedMotion = useReducedMotion();
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const rotateY = useSpring(useTransform(pointerX, [-0.5, 0.5], [-11, 11]), {
+    stiffness: 180,
+    damping: 20,
+  });
+  const rotateX = useSpring(useTransform(pointerY, [-0.5, 0.5], [9, -9]), {
+    stiffness: 180,
+    damping: 20,
+  });
+
+  function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
+    if (prefersReducedMotion) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    pointerX.set((event.clientX - bounds.left) / bounds.width - 0.5);
+    pointerY.set((event.clientY - bounds.top) / bounds.height - 0.5);
+  }
+
+  function resetTilt() {
+    pointerX.set(0);
+    pointerY.set(0);
+  }
+
+  const floatTransition = prefersReducedMotion
+    ? { duration: 0 }
+    : { duration: 3.8, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut" as const };
+
+  return (
+    <div
+      className="relative mx-auto h-52 w-52 touch-none sm:h-60 sm:w-60 lg:h-64 lg:w-64 [perspective:1000px]"
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetTilt}
+      onPointerCancel={resetTilt}
+    >
+      <motion.div
+        aria-hidden="true"
+        className="absolute bottom-3 left-1/2 h-5 w-28 -translate-x-1/2 rounded-full bg-ink/20 blur-md sm:w-32"
+        animate={prefersReducedMotion ? undefined : { scaleX: [1, 0.72], opacity: [0.25, 0.12] }}
+        transition={floatTransition}
+      />
+      <motion.div
+        className="absolute inset-0 [transform-style:preserve-3d]"
+        style={{ rotateX, rotateY }}
+        animate={prefersReducedMotion ? undefined : { y: [0, -18] }}
+        transition={floatTransition}
+      >
+        <img
+          src={mascotAsset.url}
+          alt="Cute cream and blue puppy mascot"
+          width={768}
+          height={768}
+          draggable={false}
+          className="size-full select-none object-contain drop-shadow-xl"
+        />
+      </motion.div>
+    </div>
+  );
+}
+
 
 function Index() {
   const [breed, setBreed] = useState(BREEDS[0]);
@@ -231,7 +300,20 @@ function Index() {
           </div>
         </header>
 
-        <div className="mt-8 grid gap-5 lg:grid-cols-[1fr_340px]">
+        <section className="mt-4 grid items-center gap-2 md:grid-cols-[minmax(0,1fr)_300px] md:gap-8">
+          <div className="max-w-2xl text-center md:text-left">
+            <p className="text-sm font-semibold uppercase text-brand">A healthier, happier best friend</p>
+            <h2 className="mt-2 font-display text-4xl font-bold leading-tight sm:text-5xl">
+              Friendly guidance for every tail wag.
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-ink/70 md:mx-0">
+              Tell Dr. Paws what you’ve noticed and get clear, caring next steps tailored to your dog.
+            </p>
+          </div>
+          <FloatingMascot />
+        </section>
+
+        <div className="mt-4 grid gap-5 lg:grid-cols-[1fr_340px]">
           <section className="flex flex-col rounded-3xl bg-card/40 p-4 shadow-xl shadow-brand/10 ring-1 ring-card/60 backdrop-blur-2xl sm:p-5">
             <div className="flex flex-wrap gap-2 border-b border-card/50 pb-4">
               <span className="rounded-full bg-brand/10 px-3 py-1.5 text-xs font-semibold text-brand">
