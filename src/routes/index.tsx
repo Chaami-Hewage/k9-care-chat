@@ -173,13 +173,13 @@ function FloatingMascot() {
       <motion.div
         aria-hidden="true"
         className="absolute bottom-3 left-1/2 h-5 w-28 -translate-x-1/2 rounded-full bg-ink/20 blur-md sm:w-32"
-        animate={prefersReducedMotion ? undefined : { scaleX: [1, 0.72], opacity: [0.25, 0.12] }}
+        animate={prefersReducedMotion ? false : { scaleX: [1, 0.72], opacity: [0.25, 0.12] }}
         transition={floatTransition}
       />
       <motion.div
         className="absolute inset-0 [transform-style:preserve-3d]"
         style={{ rotateX, rotateY }}
-        animate={prefersReducedMotion ? undefined : { y: [0, -18] }}
+        animate={prefersReducedMotion ? false : { y: [0, -18] }}
         transition={floatTransition}
       >
         <img
@@ -225,7 +225,7 @@ function Index() {
     setMessages((m) => [...m, { role: "user", content: message }]);
     setLoading(true);
     try {
-      const endpoint = import.meta.env.VITE_API_URL || "http://localhost:8000/api/ask-vet";
+      const endpoint = import.meta.env["VITE_API_URL"] || "http://localhost:8000/api/ask-vet";
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
