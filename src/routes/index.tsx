@@ -1,12 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useReducedMotion } from "framer-motion";
+import { lazy, Suspense, useEffect, useRef, useState, type PointerEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -134,54 +128,50 @@ const BREED_IMAGES: Record<string, { img: string; alt: string }> = {
   },
 };
 
+const DogHero3D = lazy(() => import("@/components/DogHero3D"));
+
 function FloatingMascot() {
   const prefersReducedMotion = useReducedMotion();
-  const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-  const rotateY = useSpring(useTransform(pointerX, [-0.5, 0.5], [-11, 11]), {
-    stiffness: 180,
-    damping: 20,
-  });
-  const rotateX = useSpring(useTransform(pointerY, [-0.5, 0.5], [9, -9]), {
-    stiffness: 180,
-    damping: 20,
-  });
+  const [hydrated, setHydrated] = useState(false);
+  const [action, setAction] = useState(0);
+  const pointer = useRef({ x: 0, y: 0, activeUntil: 0 });
+
+  useEffect(() => setHydrated(true), []);
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
     if (prefersReducedMotion) return;
     const bounds = event.currentTarget.getBoundingClientRect();
-    pointerX.set((event.clientX - bounds.left) / bounds.width - 0.5);
-    pointerY.set((event.clientY - bounds.top) / bounds.height - 0.5);
+    pointer.current = {
+      x: ((event.clientX - bounds.left) / bounds.width - 0.5) * 2,
+      y: ((event.clientY - bounds.top) / bounds.height - 0.5) * 2,
+      activeUntil: performance.now() + 1250,
+    };
   }
 
   function resetTilt() {
-    pointerX.set(0);
-    pointerY.set(0);
+    pointer.current = { ...pointer.current, activeUntil: 0 };
   }
-
-  const floatTransition = prefersReducedMotion
-    ? { duration: 0 }
-    : { duration: 3.8, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut" as const };
 
   return (
     <div
-      className="relative mx-auto h-52 w-52 touch-none sm:h-60 sm:w-60 lg:h-64 lg:w-64 [perspective:1000px]"
+      role="button"
+      tabIndex={0}
+      aria-label="Play with Dr. Paws"
+      className="relative mx-auto h-64 w-full max-w-sm cursor-pointer touch-none outline-none focus-visible:ring-2 focus-visible:ring-brand/60 sm:h-72 lg:h-80"
       onPointerMove={handlePointerMove}
       onPointerLeave={resetTilt}
       onPointerCancel={resetTilt}
+      onClick={() => {
+        if (!prefersReducedMotion) setAction((value) => value + 1);
+      }}
+      onKeyDown={(event) => {
+        if ((event.key === "Enter" || event.key === " ") && !prefersReducedMotion) {
+          event.preventDefault();
+          setAction((value) => value + 1);
+        }
+      }}
     >
-      <motion.div
-        aria-hidden="true"
-        className="absolute bottom-3 left-1/2 h-5 w-28 -translate-x-1/2 rounded-full bg-ink/20 blur-md sm:w-32"
-        animate={prefersReducedMotion ? false : { scaleX: [1, 0.72], opacity: [0.25, 0.12] }}
-        transition={floatTransition}
-      />
-      <motion.div
-        className="absolute inset-0 [transform-style:preserve-3d]"
-        style={{ rotateX, rotateY }}
-        animate={prefersReducedMotion ? false : { y: [0, -18] }}
-        transition={floatTransition}
-      >
+      {!hydrated || prefersReducedMotion ? (
         <img
           src={mascotAsset.url}
           alt="Cute cream and blue puppy mascot"
@@ -190,7 +180,21 @@ function FloatingMascot() {
           draggable={false}
           className="size-full select-none object-contain drop-shadow-xl"
         />
-      </motion.div>
+      ) : (
+        <Suspense
+          fallback={
+            <img
+              src={mascotAsset.url}
+              alt="Cute cream and blue puppy mascot"
+              width={768}
+              height={768}
+              className="size-full select-none object-contain drop-shadow-xl"
+            />
+          }
+        >
+          <DogHero3D pointer={pointer} action={action} />
+        </Suspense>
+      )}
     </div>
   );
 }
@@ -300,7 +304,7 @@ function Index() {
           </div>
         </header>
 
-        <section className="mt-4 grid items-center gap-2 md:grid-cols-[minmax(0,1fr)_300px] md:gap-8">
+        <section className="mt-4 grid min-h-[340px] items-center gap-0 md:grid-cols-[minmax(0,1fr)_minmax(340px,440px)] md:gap-6">
           <div className="max-w-2xl text-center md:text-left">
             <p className="text-sm font-semibold uppercase text-brand">A healthier, happier best friend</p>
             <h2 className="mt-2 font-display text-4xl font-bold leading-tight sm:text-5xl">
