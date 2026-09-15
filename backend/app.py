@@ -8,6 +8,8 @@ from config import Config
 from pinecone_service import PineconeService
 from gemini_service import GeminiService
 from agent import VetAgent
+from google_auth import GoogleAuthService
+from calendar_service import CalendarService
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -27,9 +29,11 @@ limiter = Limiter(
 )
 
 # Initialize Services & Agent
+google_auth = GoogleAuthService()
+calendar_service = CalendarService(auth_service=google_auth)
 pinecone_service = PineconeService()
 gemini_service = GeminiService()
-agent = VetAgent(pinecone_service=pinecone_service, gemini_service=gemini_service)
+agent = VetAgent(pinecone_service=pinecone_service, gemini_service=gemini_service, calendar_service=calendar_service)
 
 @app.route("/api/health", methods=["GET"])
 def health_check():
@@ -54,6 +58,7 @@ def ask_vet():
         breed = str(data.get("breed", "Unknown Breed")).strip()
         age = str(data.get("age", "3")).strip()
         weight = str(data.get("weight", "20")).strip()
+        email = str(data.get("email", "")).strip()
 
         # Input Validation & Sanitization
         if not message:
@@ -69,7 +74,8 @@ def ask_vet():
             user_message=message,
             breed=breed,
             age=age,
-            weight=weight
+            weight=weight,
+            user_email=email
         )
 
         return jsonify({
@@ -82,6 +88,42 @@ def ask_vet():
     except Exception as e:
         logger.error(f"Unhandled error in ask_vet endpoint: {e}", exc_info=True)
         return jsonify({"error": "An internal server error occurred."}), 500
+
+@app.route("/api/auth/google/url", methods=["GET"])
+def get_google_auth_url():
+    url = google_auth.get_authorization_url()
+    if url:
+        return jsonify({"url": url}), 200
+    return jsonify({"error": "Failed to generate auth url. Check config."}), 500
+
+@app.route("/api/auth/google/callback", methods=["POST"])
+def google_auth_callback():
+    data = request.get_json()
+    code = data.get("code")
+    if not code:
+        return jsonify({"error": "No code provided"}), 400
+    
+    user_info = google_auth.handle_callback(code)
+    if user_info:
+        return jsonify({"user": user_info}), 200
+    return jsonify({"error": "Failed to authenticate"}), 401
+
+@app.route("/api/auth/status", methods=["GET"])
+def auth_status():
+    email = request.args.get("email")
+    if not email:
+        return jsonify({"authenticated": False}), 400
+    is_auth = google_auth.is_authenticated(email)
+    return jsonify({"authenticated": is_auth}), 200
+
+@app.route("/api/calendar/events", methods=["GET"])
+def get_calendar_events():
+    email = request.args.get("email")
+    if not email:
+        return jsonify({"error": "Email required"}), 400
+    
+    events = calendar_service.list_upcoming_reminders(email)
+    return jsonify({"events": events}), 200
 
 @app.errorhandler(429)
 def ratelimit_handler(e):

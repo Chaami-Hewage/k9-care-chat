@@ -24,14 +24,14 @@ class GeminiService:
             try:
                 import google.generativeai as genai
                 genai.configure(api_key=Config.GEMINI_API_KEY)
-                self.legacy_model = genai.GenerativeModel('gemini-1.5-flash')
+                self.legacy_model = genai.GenerativeModel('gemini-3.6-flash')
                 logger.info("Initialized google.generativeai legacy model.")
             except Exception as legacy_err:
                 logger.error(f"Failed to initialize Gemini SDK: {legacy_err}")
 
-    def generate_response(self, system_instruction: str, prompt: str) -> str:
+    def generate_response(self, system_instruction: str, prompt: str, tools: list = None) -> str:
         """
-        Generate response from Gemini given system instruction and user prompt.
+        Generate response from Gemini given system instruction and user prompt, with optional tools.
         """
         if not Config.GEMINI_API_KEY or Config.GEMINI_API_KEY == "your_gemini_api_key_here":
             return (
@@ -41,15 +41,24 @@ class GeminiService:
 
         try:
             if self.client:
-                # Using google.genai
-                response = self.client.models.generate_content(
+                from google.genai import types
+                # Using google.genai with chat session for AFC (Automatic Function Calling) support
+                config_args = {}
+                if tools:
+                    config_args['tools'] = tools
+                if system_instruction:
+                    config_args['system_instruction'] = system_instruction
+                
+                chat = self.client.chats.create(
                     model=Config.GEMINI_MODEL,
-                    contents=f"{system_instruction}\n\nUser Query: {prompt}",
+                    config=types.GenerateContentConfig(**config_args)
                 )
+                response = chat.send_message(prompt)
                 return response.text
             elif self.legacy_model:
                 # Using google.generativeai
                 full_prompt = f"{system_instruction}\n\nUser Query: {prompt}"
+                # Legacy fallback tool calling not implemented here for simplicity
                 response = self.legacy_model.generate_content(full_prompt)
                 return response.text
             else:

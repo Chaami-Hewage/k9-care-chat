@@ -20,3 +20,8 @@ class Config:
     # Security settings
     MAX_INPUT_LENGTH = 1000
     RATE_LIMIT_DEFAULT = "30 per minute"
+
+    # Google Auth
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
+    GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "")

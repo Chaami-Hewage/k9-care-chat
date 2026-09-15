@@ -3,6 +3,8 @@ import { useReducedMotion } from "framer-motion";
 import { lazy, Suspense, useEffect, useRef, useState, type PointerEvent } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
 
 import mascotAsset from "@/assets/know-your-dog-mascot.png.asset.json";
 import hound from "@/assets/dog-sri-lankan-hound.jpg";
@@ -214,6 +216,41 @@ function Index() {
     },
   ]);
   const threadRef = useRef<HTMLDivElement>(null);
+  
+  const [authEmail, setAuthEmail] = useState(localStorage.getItem('authEmail') || '');
+  const [events, setEvents] = useState<any[]>([]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code) {
+      fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/auth/google/callback`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({code})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.user?.email) {
+          localStorage.setItem('authEmail', data.user.email);
+          setAuthEmail(data.user.email);
+        }
+        window.history.replaceState({}, document.title, window.location.pathname);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (authEmail) {
+      fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/calendar/events?email=${authEmail}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.events) {
+          setEvents(data.events.map((e: any) => ({...e, date: new Date(e.date)})));
+        }
+      });
+    }
+  }, [authEmail, messages]);
 
   useEffect(() => {
     threadRef.current?.scrollTo({
@@ -233,7 +270,7 @@ function Index() {
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, breed, age, weight }),
+        body: JSON.stringify({ message, breed, age, weight, email: authEmail }),
       });
       if (!res.ok) throw new Error(`Request failed (${res.status})`);
       const data = await res.json();
@@ -259,7 +296,7 @@ function Index() {
   const fieldClass =
     "rounded-xl bg-card/70 px-3 py-2.5 text-sm ring-1 ring-card/70 backdrop-blur-xl outline-none focus:ring-2 focus:ring-brand/50";
 
-  
+
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden text-ink selection:bg-brand/20">
@@ -272,9 +309,8 @@ function Index() {
             aria-hidden={name === breed ? undefined : true}
             width={1024}
             height={640}
-            className={`absolute inset-0 size-full object-cover transition-opacity duration-700 ease-out ${
-              name === breed ? "opacity-100" : "opacity-0"
-            }`}
+            className={`absolute inset-0 size-full object-cover transition-opacity duration-700 ease-out ${name === breed ? "opacity-100" : "opacity-0"
+              }`}
           />
         ))}
         <div className="absolute inset-0 bg-card/55 backdrop-blur-[2px]" />
@@ -405,6 +441,53 @@ function Index() {
           </section>
 
           <aside className="flex flex-col gap-5">
+            <div className="rounded-3xl bg-card/40 p-5 shadow-xl shadow-brand/10 ring-1 ring-card/60 backdrop-blur-2xl">
+              <h2 className="font-display text-lg font-semibold">Calendar</h2>
+              {!authEmail ? (
+                <div className="mt-4 flex flex-col items-center gap-3 text-center">
+                  <p className="text-sm text-ink/70">Connect your Google Calendar to schedule vet appointments and vaccine reminders automatically.</p>
+                  <button 
+                    onClick={() => {
+                       fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/auth/google/url`)
+                       .then(r => r.json())
+                       .then(d => { if (d.url) window.location.href = d.url; });
+                    }}
+                    className="rounded-full bg-brand px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand/90"
+                  >
+                    Connect Google Calendar
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-4 flex flex-col items-center">
+                  <div className="w-full flex justify-between items-center mb-3">
+                    <p className="text-xs text-ink/50 truncate max-w-[150px]" title={authEmail}>{authEmail}</p>
+                    <button 
+                      onClick={() => { localStorage.removeItem('authEmail'); setAuthEmail(''); setEvents([]); }}
+                      className="text-xs text-brand hover:underline"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                  <div className="bg-card/60 rounded-xl p-2 w-full flex justify-center">
+                    <DayPicker 
+                      mode="multiple"
+                      selected={events.map(e => e.date)}
+                      className="text-xs scale-90"
+                    />
+                  </div>
+                  <div className="mt-4 w-full text-sm text-ink/80 flex flex-col gap-2 max-h-[200px] overflow-y-auto">
+                    {events.length === 0 && <p className="text-xs text-center text-ink/50 py-2">No upcoming events.</p>}
+                    {events.map((e, i) => (
+                      <div key={i} className="flex flex-col rounded-lg bg-card/60 p-2 text-xs border border-card/40">
+                        <strong className="text-brand line-clamp-1" title={e.summary}>{e.summary}</strong>
+                        <span className="text-ink/60">{e.date.toLocaleDateString()} {e.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="rounded-3xl bg-card/40 p-5 shadow-xl shadow-brand/10 ring-1 ring-card/60 backdrop-blur-2xl">
               <h2 className="font-display text-lg font-semibold">Dog profile</h2>
               <div className="mt-4 flex flex-col gap-4">
