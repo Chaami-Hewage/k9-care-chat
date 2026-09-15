@@ -217,7 +217,7 @@ function Index() {
   ]);
   const threadRef = useRef<HTMLDivElement>(null);
   
-  const [authEmail, setAuthEmail] = useState(localStorage.getItem('authEmail') || '');
+  const [authEmail, setAuthEmail] = useState(typeof window !== 'undefined' ? localStorage.getItem('authEmail') || '' : '');
   const [events, setEvents] = useState<any[]>([]);
 
   useEffect(() => {

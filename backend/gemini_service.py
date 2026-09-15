@@ -49,12 +49,25 @@ class GeminiService:
                 if system_instruction:
                     config_args['system_instruction'] = system_instruction
                 
-                chat = self.client.chats.create(
-                    model=Config.GEMINI_MODEL,
-                    config=types.GenerateContentConfig(**config_args)
-                )
-                response = chat.send_message(prompt)
-                return response.text
+                try:
+                    chat = self.client.chats.create(
+                        model=Config.GEMINI_MODEL,
+                        config=types.GenerateContentConfig(**config_args)
+                    )
+                    response = chat.send_message(prompt)
+                    return response.text
+                except Exception as api_err:
+                    err_str = str(api_err)
+                    if "503" in err_str or "UNAVAILABLE" in err_str or "high demand" in err_str.lower():
+                        logger.warning(f"Model {Config.GEMINI_MODEL} is unavailable, falling back to gemini-3.5-flash-lite")
+                        fallback_chat = self.client.chats.create(
+                            model="gemini-3.5-flash-lite",
+                            config=types.GenerateContentConfig(**config_args)
+                        )
+                        fallback_resp = fallback_chat.send_message(prompt)
+                        return fallback_resp.text
+                    else:
+                        raise api_err
             elif self.legacy_model:
                 # Using google.generativeai
                 full_prompt = f"{system_instruction}\n\nUser Query: {prompt}"
